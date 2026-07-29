@@ -40,6 +40,20 @@ public class AppSetting {
     protected AppSetting() {
     }
 
+    public AppSetting(UUID id, Pharmacy pharmacy, String settingKey, String settingValue, Instant createdAt, Instant lastUpdatedAt) {
+        this.id = id;
+        this.pharmacy = pharmacy;
+        this.createdAt = createdAt;
+        update(settingKey, settingValue, lastUpdatedAt);
+    }
+
+    public void update(String settingKey, String settingValue, Instant lastUpdatedAt) {
+        this.settingKey = settingKey;
+        this.settingValue = settingValue;
+        this.lastUpdatedAt = lastUpdatedAt;
+        this.deleted = false;
+    }
+
     public UUID getId() {
         return id;
     }

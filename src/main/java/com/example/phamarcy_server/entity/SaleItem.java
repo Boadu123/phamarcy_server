@@ -55,6 +55,24 @@ public class SaleItem {
     protected SaleItem() {
     }
 
+    public SaleItem(UUID id, Pharmacy pharmacy, Sale sale, Batch batch, String productName, String batchNumber, Integer quantitySold, BigDecimal unitPrice, Instant createdAt, Instant lastUpdatedAt) {
+        this.id = id;
+        this.pharmacy = pharmacy;
+        this.createdAt = createdAt;
+        update(sale, batch, productName, batchNumber, quantitySold, unitPrice, lastUpdatedAt);
+    }
+
+    public void update(Sale sale, Batch batch, String productName, String batchNumber, Integer quantitySold, BigDecimal unitPrice, Instant lastUpdatedAt) {
+        this.sale = sale;
+        this.batch = batch;
+        this.productName = productName;
+        this.batchNumber = batchNumber;
+        this.quantitySold = quantitySold;
+        this.unitPrice = unitPrice;
+        this.lastUpdatedAt = lastUpdatedAt;
+        this.deleted = false;
+    }
+
     public UUID getId() {
         return id;
     }

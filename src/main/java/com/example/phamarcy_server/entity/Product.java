@@ -46,6 +46,22 @@ public class Product {
     protected Product() {
     }
 
+    public Product(UUID id, Pharmacy pharmacy, String name, String description, String category, Integer reorderLevel, Instant createdAt, Instant lastUpdatedAt) {
+        this.id = id;
+        this.pharmacy = pharmacy;
+        update(name, description, category, reorderLevel, createdAt, lastUpdatedAt);
+    }
+
+    public void update(String name, String description, String category, Integer reorderLevel, Instant createdAt, Instant lastUpdatedAt) {
+        this.name = name;
+        this.description = description;
+        this.category = category;
+        this.reorderLevel = reorderLevel;
+        this.createdAt = createdAt;
+        this.lastUpdatedAt = lastUpdatedAt;
+        this.deleted = false;
+    }
+
     public UUID getId() {
         return id;
     }

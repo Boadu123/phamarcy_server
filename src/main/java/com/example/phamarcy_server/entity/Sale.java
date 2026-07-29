@@ -51,6 +51,21 @@ public class Sale {
     protected Sale() {
     }
 
+    public Sale(UUID id, Pharmacy pharmacy, UserAccount user, Instant saleDate, BigDecimal totalAmount, Instant createdAt, Instant lastUpdatedAt) {
+        this.id = id;
+        this.pharmacy = pharmacy;
+        this.createdAt = createdAt;
+        update(user, saleDate, totalAmount, lastUpdatedAt);
+    }
+
+    public void update(UserAccount user, Instant saleDate, BigDecimal totalAmount, Instant lastUpdatedAt) {
+        this.user = user;
+        this.saleDate = saleDate;
+        this.totalAmount = totalAmount;
+        this.lastUpdatedAt = lastUpdatedAt;
+        this.deleted = false;
+    }
+
     public UUID getId() {
         return id;
     }

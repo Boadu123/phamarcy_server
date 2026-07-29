@@ -1,7 +1,6 @@
 package com.example.phamarcy_server.security;
 
 import com.example.phamarcy_server.service.PharmacyAuthenticationService;
-import com.example.phamarcy_server.util.ApiPaths;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,11 +9,9 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
-@Component
 public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
     public static final String HEADER_NAME = "X-Pharmacy-Token";
@@ -34,7 +31,8 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return !("POST".equalsIgnoreCase(request.getMethod()) && ApiPaths.SYNC.equals(request.getServletPath()));
+        // Current Docker sync clients do not send X-Pharmacy-Token; keep this filter dormant until token auth is reintroduced.
+        return true;
     }
 
     @Override

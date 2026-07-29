@@ -43,6 +43,21 @@ public class UserAccount {
     protected UserAccount() {
     }
 
+    public UserAccount(UUID id, Pharmacy pharmacy, String username, String passwordHash, String role, Instant createdAt, Instant lastUpdatedAt) {
+        this.id = id;
+        this.pharmacy = pharmacy;
+        update(username, passwordHash, role, createdAt, lastUpdatedAt);
+    }
+
+    public void update(String username, String passwordHash, String role, Instant createdAt, Instant lastUpdatedAt) {
+        this.username = username;
+        this.passwordHash = passwordHash;
+        this.role = role;
+        this.createdAt = createdAt;
+        this.lastUpdatedAt = lastUpdatedAt;
+        this.deleted = false;
+    }
+
     public UUID getId() {
         return id;
     }

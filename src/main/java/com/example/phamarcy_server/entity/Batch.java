@@ -7,13 +7,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
-@Table(name = "batches")
+@Table(
+        name = "batches",
+        uniqueConstraints = @UniqueConstraint(name = "ux_batches_pharmacy_stock_reference", columnNames = {"pharmacy_id", "stock_reference"})
+)
 public class Batch {
 
     @Id
@@ -27,6 +31,9 @@ public class Batch {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
+    @Column(name = "stock_reference", nullable = false, length = 64)
+    private String stockReference;
 
     @Column(name = "batch_number", nullable = false, length = 120)
     private String batchNumber;
@@ -55,6 +62,25 @@ public class Batch {
     protected Batch() {
     }
 
+    public Batch(UUID id, Pharmacy pharmacy, Product product, String stockReference, String batchNumber, Integer quantity, BigDecimal costPrice, BigDecimal sellingPrice, LocalDate expiryDate, Instant createdAt, Instant lastUpdatedAt) {
+        this.id = id;
+        this.pharmacy = pharmacy;
+        this.createdAt = createdAt;
+        update(product, stockReference, batchNumber, quantity, costPrice, sellingPrice, expiryDate, lastUpdatedAt);
+    }
+
+    public void update(Product product, String stockReference, String batchNumber, Integer quantity, BigDecimal costPrice, BigDecimal sellingPrice, LocalDate expiryDate, Instant lastUpdatedAt) {
+        this.product = product;
+        this.stockReference = stockReference;
+        this.batchNumber = batchNumber;
+        this.quantity = quantity;
+        this.costPrice = costPrice;
+        this.sellingPrice = sellingPrice;
+        this.expiryDate = expiryDate;
+        this.lastUpdatedAt = lastUpdatedAt;
+        this.deleted = false;
+    }
+
     public UUID getId() {
         return id;
     }
@@ -65,6 +91,10 @@ public class Batch {
 
     public Product getProduct() {
         return product;
+    }
+
+    public String getStockReference() {
+        return stockReference;
     }
 
     public String getBatchNumber() {
