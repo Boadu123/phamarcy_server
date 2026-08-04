@@ -1,6 +1,6 @@
 # Frontend UI Specification: Dockerized Pharmacy Sync Updates
 
-Last updated: 2026-07-21
+Last updated: 2026-08-04
 
 ## Purpose
 
@@ -706,9 +706,10 @@ Optional detail-table and compatibility endpoints:
 GET /api/v1/admin/pharmacies/{pharmacyId}/dashboard
 GET /api/v1/admin/pharmacies/{pharmacyId}/inventory
 GET /api/v1/admin/pharmacies/{pharmacyId}/sales
+GET /api/v1/admin/pharmacies/{pharmacyId}/sales/{saleId}
 ```
 
-All current admin reports read `batches` and `sales` from the detailed sync model. No authentication header is required in the current local configuration. Browser access is allowed from the configured CORS origins, which default to localhost port `5173`.
+The sale-details route must be called with both the selected `pharmacyId` and `saleId`; a sale is never looked up outside its pharmacy scope. It returns sale, pharmacy, cashier, and active line-item data in one response, including product/batch identifiers and line subtotals. All current admin reports read `batches` and `sales` from the detailed sync model. No authentication header is required in the current local configuration. Browser access is allowed from the configured CORS origins, which default to localhost port `5173`.
 
 ### Success States
 

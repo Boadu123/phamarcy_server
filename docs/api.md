@@ -1,6 +1,6 @@
 # API Reference
 
-Last verified against the automated HTTP integration suite on 2026-07-28.
+Last verified against the automated HTTP integration suite on 2026-08-04.
 
 ## Endpoint Policy
 
@@ -405,6 +405,62 @@ Returns active detailed sale headers newest first:
 ]
 ```
 
+### Pharmacy Sale Details
+
+```http
+GET /api/v1/admin/pharmacies/{pharmacyId}/sales/{saleId}
+```
+
+Returns one active sale only when it belongs to the pharmacy in the same path. The ownership constraint is applied by the database query; a sale belonging to another pharmacy is returned as `404 Not Found`, just like an unknown sale.
+
+```json
+{
+  "id": "50000000-0000-0000-0000-000000000001",
+  "pharmacy_id": "10000000-0000-0000-0000-000000000001",
+  "pharmacy_name": "Example Pharmacy",
+  "location": "Reykjavik",
+  "user_id": "20000000-0000-0000-0000-000000000001",
+  "username": "cashier",
+  "total_amount": 48.25,
+  "sale_date": "2026-08-04T09:20:00Z",
+  "item_count": 2,
+  "created_at": "2026-08-04T09:00:00Z",
+  "last_updated_at": "2026-08-04T09:30:00Z",
+  "items": [
+    {
+      "id": "60000000-0000-0000-0000-000000000001",
+      "product_id": "30000000-0000-0000-0000-000000000001",
+      "product_name": "Paracetamol",
+      "batch_id": "40000000-0000-0000-0000-000000000001",
+      "stock_reference": "STK-PARA-001",
+      "batch_number": "PARA-26A",
+      "quantity_sold": 2,
+      "unit_price": 12.50,
+      "subtotal": 25.00,
+      "created_at": "2026-08-04T09:00:00Z",
+      "last_updated_at": "2026-08-04T09:30:00Z"
+    },
+    {
+      "id": "60000000-0000-0000-0000-000000000002",
+      "product_id": "30000000-0000-0000-0000-000000000002",
+      "product_name": "ORS",
+      "batch_id": "40000000-0000-0000-0000-000000000002",
+      "stock_reference": "STK-ORS-002",
+      "batch_number": "ORS-26B",
+      "quantity_sold": 3,
+      "unit_price": 7.75,
+      "subtotal": 23.25,
+      "created_at": "2026-08-04T09:00:01Z",
+      "last_updated_at": "2026-08-04T09:30:00Z"
+    }
+  ]
+}
+```
+
+`total_amount` is the authoritative stored sale total. Each item `subtotal` is calculated with decimal arithmetic as `quantity_sold * unit_price`. Product and manufacturer batch names come from the sale-item snapshots; `product_id` and `stock_reference` are resolved through the associated batch. Deleted sale items are omitted. A valid sale with no active items returns `"item_count": 0` and `"items": []`.
+
+Invalid `pharmacyId` or `saleId` values return the standard validation body with HTTP `400`. An unknown pharmacy returns the pharmacy `404`. An unknown sale and a sale owned by another pharmacy return the same scoped sale `404`. The endpoint follows the current admin-read security policy described above, so no authentication header is required in the current configuration.
+
 ## Error Format
 
 Validation and application errors use this shape:
@@ -427,7 +483,7 @@ Common statuses:
 | Status | Meaning |
 | --- | --- |
 | `200` | Request succeeded. Sync committed. |
-| `400` | Malformed JSON, validation failure, duplicate ID in payload, or missing relationship. |
-| `404` | Pharmacy was not found for admin pharmacy-specific reporting. |
+| `400` | Malformed JSON, validation failure (including invalid UUID path values), duplicate ID in payload, or missing relationship. |
+| `404` | Pharmacy or pharmacy-scoped sale was not found, or the requested application route does not exist. |
 | `409` | Record belongs to another pharmacy or batch `stock_reference` conflicts. |
 | `500` | Unexpected server error. |

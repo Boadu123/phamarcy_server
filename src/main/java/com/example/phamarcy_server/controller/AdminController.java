@@ -6,6 +6,7 @@ import com.example.phamarcy_server.dto.InventoryResponse;
 import com.example.phamarcy_server.dto.PharmacyDetailsResponse;
 import com.example.phamarcy_server.dto.PharmacyDashboardResponse;
 import com.example.phamarcy_server.dto.PharmacySummaryResponse;
+import com.example.phamarcy_server.dto.SaleDetailsResponse;
 import com.example.phamarcy_server.dto.SaleResponse;
 import com.example.phamarcy_server.dto.SyncActivityResponse;
 import com.example.phamarcy_server.service.AdminReportingService;
@@ -119,6 +120,24 @@ public class AdminController {
             @Parameter(description = "Internal pharmacy ID selected from the pharmacy list") @PathVariable UUID pharmacyId
     ) {
         return adminReportingService.getSales(pharmacyId);
+    }
+
+    @GetMapping("/pharmacies/{pharmacyId}/sales/{saleId}")
+    @Operation(
+            summary = "Get sale details for a pharmacy",
+            description = "Returns an active sale only when it belongs to the requested pharmacy.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Sale details returned", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SaleDetailsResponse.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid pharmacy or sale UUID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
+                    @ApiResponse(responseCode = "404", description = "Pharmacy or scoped sale not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
+                    @ApiResponse(responseCode = "500", description = "Unexpected server error", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class)))
+            }
+    )
+    public SaleDetailsResponse pharmacySaleDetails(
+            @Parameter(description = "Internal pharmacy ID selected from the pharmacy list") @PathVariable UUID pharmacyId,
+            @Parameter(description = "Sale ID within the selected pharmacy") @PathVariable UUID saleId
+    ) {
+        return adminReportingService.getSaleDetails(pharmacyId, saleId);
     }
 
     @GetMapping("/pharmacies/{pharmacyId}/dashboard")

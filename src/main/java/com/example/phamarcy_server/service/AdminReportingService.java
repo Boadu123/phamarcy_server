@@ -5,6 +5,7 @@ import com.example.phamarcy_server.dto.InventoryResponse;
 import com.example.phamarcy_server.dto.PharmacyDetailsResponse;
 import com.example.phamarcy_server.dto.PharmacyDashboardResponse;
 import com.example.phamarcy_server.dto.PharmacySummaryResponse;
+import com.example.phamarcy_server.dto.SaleDetailsResponse;
 import com.example.phamarcy_server.dto.SaleResponse;
 import com.example.phamarcy_server.dto.SyncActivityResponse;
 import java.util.List;
@@ -25,6 +26,8 @@ public interface AdminReportingService {
     List<InventoryResponse> getInventory(UUID pharmacyId);
 
     List<SaleResponse> getSales(UUID pharmacyId);
+
+    SaleDetailsResponse getSaleDetails(UUID pharmacyId, UUID saleId);
 
     PharmacyDashboardResponse getPharmacyDashboard(UUID pharmacyId);
 }

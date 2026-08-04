@@ -6,6 +6,8 @@ import com.example.phamarcy_server.dto.InventoryStatisticsResponse;
 import com.example.phamarcy_server.dto.PharmacyDashboardResponse;
 import com.example.phamarcy_server.dto.PharmacyDetailsResponse;
 import com.example.phamarcy_server.dto.PharmacySummaryResponse;
+import com.example.phamarcy_server.dto.SaleDetailsResponse;
+import com.example.phamarcy_server.dto.SaleItemResponse;
 import com.example.phamarcy_server.dto.SaleResponse;
 import com.example.phamarcy_server.dto.SalesStatisticsResponse;
 import com.example.phamarcy_server.dto.SyncActivityResponse;
@@ -13,10 +15,13 @@ import com.example.phamarcy_server.dto.SyncActivityStatus;
 import com.example.phamarcy_server.entity.Batch;
 import com.example.phamarcy_server.entity.Pharmacy;
 import com.example.phamarcy_server.entity.Sale;
+import com.example.phamarcy_server.entity.SaleItem;
 import com.example.phamarcy_server.entity.SyncActivity;
 import com.example.phamarcy_server.exception.PharmacyNotFoundException;
+import com.example.phamarcy_server.exception.SaleNotFoundException;
 import com.example.phamarcy_server.repository.BatchRepository;
 import com.example.phamarcy_server.repository.PharmacyRepository;
+import com.example.phamarcy_server.repository.SaleItemRepository;
 import com.example.phamarcy_server.repository.SaleRepository;
 import com.example.phamarcy_server.repository.SyncActivityRepository;
 import com.example.phamarcy_server.service.AdminReportingService;
@@ -36,17 +41,20 @@ public class AdminReportingServiceImpl implements AdminReportingService {
     private final PharmacyRepository pharmacyRepository;
     private final BatchRepository batchRepository;
     private final SaleRepository saleRepository;
+    private final SaleItemRepository saleItemRepository;
     private final SyncActivityRepository syncActivityRepository;
 
     public AdminReportingServiceImpl(
             PharmacyRepository pharmacyRepository,
             BatchRepository batchRepository,
             SaleRepository saleRepository,
+            SaleItemRepository saleItemRepository,
             SyncActivityRepository syncActivityRepository
     ) {
         this.pharmacyRepository = pharmacyRepository;
         this.batchRepository = batchRepository;
         this.saleRepository = saleRepository;
+        this.saleItemRepository = saleItemRepository;
         this.syncActivityRepository = syncActivityRepository;
     }
 
@@ -134,6 +142,32 @@ public class AdminReportingServiceImpl implements AdminReportingService {
         return saleRepository.findActiveSales(pharmacyId).stream()
                 .map(this::toSaleResponse)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public SaleDetailsResponse getSaleDetails(UUID pharmacyId, UUID saleId) {
+        ensurePharmacyExists(pharmacyId);
+        Sale sale = saleRepository.findActiveByIdAndPharmacyId(saleId, pharmacyId)
+                .orElseThrow(() -> new SaleNotFoundException(pharmacyId, saleId));
+        List<SaleItemResponse> items = saleItemRepository.findActiveBySaleIdAndPharmacyId(saleId, pharmacyId).stream()
+                .map(this::toSaleItemResponse)
+                .toList();
+
+        return new SaleDetailsResponse(
+                sale.getId(),
+                sale.getPharmacy().getId(),
+                sale.getPharmacy().getName(),
+                sale.getPharmacy().getLocation(),
+                sale.getUser().getId(),
+                sale.getUser().getUsername(),
+                sale.getTotalAmount(),
+                sale.getSaleDate(),
+                items.size(),
+                sale.getCreatedAt(),
+                sale.getLastUpdatedAt(),
+                items
+        );
     }
 
     @Override
@@ -226,6 +260,22 @@ public class AdminReportingServiceImpl implements AdminReportingService {
                 sale.getSaleDate(),
                 sale.getItems().size(),
                 sale.getLastUpdatedAt()
+        );
+    }
+
+    private SaleItemResponse toSaleItemResponse(SaleItem item) {
+        return new SaleItemResponse(
+                item.getId(),
+                item.getBatch().getProduct().getId(),
+                item.getProductName(),
+                item.getBatch().getId(),
+                item.getBatch().getStockReference(),
+                item.getBatchNumber(),
+                item.getQuantitySold(),
+                item.getUnitPrice(),
+                item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantitySold().longValue())),
+                item.getCreatedAt(),
+                item.getLastUpdatedAt()
         );
     }
 

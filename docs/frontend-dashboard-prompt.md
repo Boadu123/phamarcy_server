@@ -243,6 +243,14 @@ GET /api/v1/admin/pharmacies/{pharmacyId}/sales
 
 Returns `SaleRecord[]` newest first. Show sale time, cashier username, item count, total amount, and last update time.
 
+When an administrator selects a sale, navigate with both IDs and load its full details:
+
+```http
+GET /api/v1/admin/pharmacies/{pharmacyId}/sales/{saleId}
+```
+
+The detail response contains pharmacy and cashier metadata, the authoritative sale total and timestamps, and all active sale items. Each item includes product and batch identifiers, snapshot product and batch names, stock reference, quantity sold, unit price, and subtotal. Treat `404` as unavailable within the selected pharmacy; do not retry by sale ID alone.
+
 ### Compact Compatibility Dashboard
 
 ```http

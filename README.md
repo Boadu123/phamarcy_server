@@ -75,6 +75,7 @@ GET  /api/v1/admin/pharmacies/{pharmacyId}/sync-activity?limit=20
 GET  /api/v1/admin/pharmacies/{pharmacyId}/dashboard
 GET  /api/v1/admin/pharmacies/{pharmacyId}/inventory
 GET  /api/v1/admin/pharmacies/{pharmacyId}/sales
+GET  /api/v1/admin/pharmacies/{pharmacyId}/sales/{saleId}
 ```
 
 See [docs/api.md](docs/api.md) for payloads, validation rules, response examples, and error formats.

@@ -15,6 +15,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -62,6 +64,21 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         return ResponseEntity.status(status)
                 .body(ApiError.of(status.value(), status.getReasonPhrase(), "Malformed JSON request body", request.getRequestURI()));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiError> handleTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+        String message = java.util.UUID.class.equals(ex.getRequiredType())
+                ? "must be a valid UUID"
+                : "has an invalid value";
+        return validationResponse(request, List.of(new ApiViolation(ex.getName(), message)));
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiError> handleNoResourceFound(NoResourceFoundException ex, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        return ResponseEntity.status(status)
+                .body(ApiError.of(status.value(), status.getReasonPhrase(), "Resource not found", request.getRequestURI()));
     }
 
     @ExceptionHandler(Exception.class)

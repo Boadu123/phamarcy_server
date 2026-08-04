@@ -1,6 +1,6 @@
 # Testing Guide
 
-Last updated: 2026-07-28.
+Last updated: 2026-08-04.
 
 ## Test Stack
 
@@ -74,6 +74,7 @@ Expected application paths:
 /api/v1/admin/pharmacies/{pharmacyId}/dashboard
 /api/v1/admin/pharmacies/{pharmacyId}/inventory
 /api/v1/admin/pharmacies/{pharmacyId}/sales
+/api/v1/admin/pharmacies/{pharmacyId}/sales/{saleId}
 /api/v1/admin/pharmacies/{pharmacyId}/sync-activity
 /api/v1/admin/sync-activity
 /api/v1/health
@@ -102,6 +103,17 @@ There should be no non-versioned application paths in Swagger.
 - A missing relationship rolls operational changes back and persists a frontend-visible failed attempt.
 - Activity limits and pharmacy-not-found errors use the shared JSON error contract.
 - The configured localhost frontend origin receives a valid CORS preflight response.
+
+`SaleDetailsIntegrationTests` verifies:
+
+- A sale is returned only within its pharmacy scope and contains all active line items.
+- Product and batch identifiers, snapshot names, quantities, prices, and decimal subtotals are mapped correctly.
+- A sale with no line items returns an empty `items` array.
+- Missing pharmacies, missing sales, and cross-pharmacy sale requests return the shared `404` response without exposing sale data.
+- Invalid pharmacy and sale UUID path variables return the shared validation response with HTTP `400`.
+- The route follows the current admin `permitAll` policy and succeeds without credentials.
+- Swagger publishes both path parameters, the detail/item schemas, and the documented `200`, `400`, `404`, and `500` responses.
+- Unmapped admin resources use the shared `404` response rather than an unexpected `500`.
 
 ## Documentation Verification
 
